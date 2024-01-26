@@ -5,9 +5,14 @@ import { auth, signInWithGooglePopup , createUserDocumentFromAuth, signInWithGoo
 
 const SignIn = () => {
 
-    useEffect( async () => {
+    useEffect(() => {
+        const handleRedirect = async() => {
         const response = await getRedirectResult(auth)
-        console.log(response);
+        if (response){
+            const userDocRef = await createUserDocumentFromAuth(response.user)
+        }
+        };
+        handleRedirect();
     },[]);
 
     const logGoogleUser = async () => {
