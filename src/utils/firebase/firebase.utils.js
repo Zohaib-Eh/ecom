@@ -1,18 +1,46 @@
 import { initializeApp } from 'firebase/app';
 import {getAuth, signInWithRedirect, signInWithPopup, GoogleAuthProvider} from 'firebase/auth';
+import {getFirestore, doc, getDoc, setDoc} from 'firebase/firestore'
 
 const firebaseConfig = {
-    apiKey: "AIzaSyBMtWjRZgAfXfriWlls9J4oQmXPNzV7a64",
-    authDomain: "ecom-project-ffff2.firebaseapp.com",
-    projectId: "ecom-project-ffff2",
-    storageBucket: "ecom-project-ffff2.appspot.com",
-    messagingSenderId: "269259715117",
-    appId: "1:269259715117:web:25fb28d4a69e2c000afea4"
-  };
+  apiKey: "AIzaSyDMLKalUCt4NdazNq-Ud2J9zHtDAAxeuoA",
+  authDomain: "ecom-570ad.firebaseapp.com",
+  projectId: "ecom-570ad",
+  storageBucket: "ecom-570ad.appspot.com",
+  messagingSenderId: "926198632966",
+  appId: "1:926198632966:web:f8d400bc98da92b58ba987"
+};
   
-  const firebaseApp = initializeApp(firebaseConfig);
+const firebaseApp = initializeApp(firebaseConfig);
 
-  const provider = new GoogleAuthProvider();
-  provider.setCustomParameters({
-    prompt: "select_account"
-  });
+const googleprovider = new GoogleAuthProvider();
+googleprovider.setCustomParameters({
+  prompt: "select_account"
+});
+
+export const auth = getAuth();
+export const signInWithGooglePopup = () => signInWithPopup(auth,googleprovider);
+export const signInWithGoogleRedirect = () => signInWithRedirect(auth,googleprovider);
+export const db = getFirestore()
+
+export const createUserDocumentFromAuth = async (userAuth) => {
+  const userDocRef = doc(db,'users',userAuth.uid);
+  console.log(userDocRef);
+  const userSnapshot = await getDoc(userDocRef);
+  console.log(userSnapshot)
+  console.log(userSnapshot.exists())
+  if(!userSnapshot.exists()){
+    const {displayName,email} = userAuth;
+    const createdAt = new Date();
+    try{
+      await setDoc(userDocRef,{
+        displayName,
+        email,
+        createdAt 
+      });
+    }catch (error) {
+      console.log("error creating the user", error.message);
+    }
+  }
+  return userDocRef;
+};
